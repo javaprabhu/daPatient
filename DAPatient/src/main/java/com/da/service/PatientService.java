@@ -1,77 +1,52 @@
 package com.da.service;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.da.model.Patient;
+import com.da.repository.PatientRepository;
 import com.google.api.core.ApiFuture;
-import com.google.cloud.firestore.CollectionReference;
-import com.google.cloud.firestore.DocumentReference;
-import com.google.cloud.firestore.DocumentSnapshot;
-import com.google.cloud.firestore.Firestore;
-import com.google.cloud.firestore.Query;
-import com.google.cloud.firestore.QueryDocumentSnapshot;
-import com.google.cloud.firestore.QuerySnapshot;
-import com.google.cloud.firestore.WriteResult;
-import com.google.firebase.cloud.FirestoreClient;
 
 
 @Service
 public class PatientService {
 	
-	private static final String COL_NAME = "Patient";
+	private static Logger logger = LoggerFactory.getLogger(PatientService.class);
+	
+	@Autowired
+	private PatientRepository patientRepository;
 		
 	public String savePatient(Patient patient) throws InterruptedException, ExecutionException {
-		Firestore fireStore = FirestoreClient.getFirestore();
-		ApiFuture<WriteResult> apiFuture = fireStore.collection(COL_NAME).document(patient.getfName()).set(patient);
-		return apiFuture.get().getUpdateTime().toString();
+		logger.info("savePatient service called");
+		if(patient!=null) {
+			//patient validation
+			return patientRepository.savePatient(patient);
+		}
+		throw new InterruptedException("Patient is not valid");
 	}
 	
 	public Patient getPatient(String fName) throws InterruptedException, ExecutionException {
-		Firestore fireStore = FirestoreClient.getFirestore();
-		DocumentReference document = fireStore.collection(COL_NAME).document(fName);
-		ApiFuture<DocumentSnapshot> apiFuture = document.get();
-		DocumentSnapshot snapshot = apiFuture.get();
-		Patient patient = null;
-		if(snapshot.exists()) {
-			patient = snapshot.toObject(Patient.class);
-			if(patient.isDeleted()) {
-				return null;
-			}
-		}
-		return patient;
+		logger.info("getPatient service called");
+		return patientRepository.getPatient(fName);
 	}
 	
 	public List<Patient> getPatientList(int offset, int limit) throws InterruptedException, ExecutionException, TimeoutException {
-		List<Patient> patients = new ArrayList<Patient>();
-		Firestore fireStore = FirestoreClient.getFirestore();
-		CollectionReference patCol = fireStore.collection(COL_NAME);
-		Query firstPage = patCol.whereEqualTo("deleted",false).offset(offset).limit(limit);
-
-		ApiFuture<QuerySnapshot> future = firstPage.get();
-		List<QueryDocumentSnapshot> documents = future.get().getDocuments();
-		Iterator<QueryDocumentSnapshot> iterator = documents.iterator();
-		while(iterator.hasNext()) {
-			QueryDocumentSnapshot next = iterator.next();
-			if(next.exists()) {
-				Patient object = next.toObject(Patient.class);
-				patients.add(object);
-			}
-		}
-		return patients;
+		logger.info("savePatient service called");
+		return patientRepository.getPatientList(offset, limit);
 	}
 	
 	public String deletePatient(String name) throws InterruptedException, ExecutionException {
-		Patient patient = getPatient(name);
-        Firestore fireStore = FirestoreClient.getFirestore();
-        patient.setDeleted(true);
-		ApiFuture<WriteResult> apiFuture = fireStore.collection(COL_NAME).document(name).set(patient);
-        return "Document with Patient ID "+name+" has been deleted";
+		logger.info("deletePatient service called");
+		ApiFuture<?> deletePatient = patientRepository.deletePatient(name);
+		if(deletePatient!=null)
+			return "Document with Patient ID "+name+" has been deleted";
+		return "Patient not found with name "+name;
     }
 	
 }

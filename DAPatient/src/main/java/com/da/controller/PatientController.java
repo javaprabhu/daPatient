@@ -1,8 +1,7 @@
 package com.da.controller;
 
+import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,27 +28,47 @@ public class PatientController {
 	private PatientService patientService;
 	
 	@PostMapping("/savePatient")
-	public String savePatient(@RequestBody Patient patient) throws InterruptedException, ExecutionException {
+	public String savePatient(@RequestBody Patient patient) {
 		logger.info("savePatient invoked with param "+patient);
-		return patientService.savePatient(patient);
+		try {
+			return patientService.savePatient(patient);
+		}catch(Exception e) {
+			logger.error(e.getMessage());
+			return "patient did not saved";
+		}
 	}
 	
 	@GetMapping("/{fName}")
-	public Patient getPatient(@PathVariable("fName")String fName) throws InterruptedException, ExecutionException {
+	public Patient getPatient(@PathVariable("fName")String fName) {
 		logger.info("getPatient invoked with fName "+fName);
-		return patientService.getPatient(fName);
+		try {
+			return patientService.getPatient(fName);
+		}catch(Exception e) {
+			logger.error(e.getMessage());
+			return null;
+		}
 	}
 	
 	@GetMapping("/list")
-	public List<Patient> patientList(@RequestParam("offset")Integer offset, @RequestParam("limit")Integer limit) throws InterruptedException, ExecutionException, TimeoutException {
+	public List<Patient> patientList(@RequestParam("offset")Integer offset, @RequestParam("limit")Integer limit) {
 		logger.info("patientList invoked with param "+offset+"and"+limit);
-		return patientService.getPatientList(offset, limit);
+		try {
+			return patientService.getPatientList(offset, limit);
+		}catch(Exception e) {
+			logger.error(e.getMessage());
+			return Collections.emptyList();
+		}
 	}
 	
 	@DeleteMapping("/{fName}")
-	public String deletePatientWithName(@PathVariable("fName")String fName) throws InterruptedException, ExecutionException {
+	public String deletePatientWithName(@PathVariable("fName")String fName) {
 		logger.info("deletePatientWithName invoked with param "+fName);
-		return patientService.deletePatient(fName);
+		try {
+			return patientService.deletePatient(fName);
+		}catch(Exception e) {
+			logger.error(e.getMessage());
+			return "Patient not found with name "+fName;
+		}
 	}
 	
 }
