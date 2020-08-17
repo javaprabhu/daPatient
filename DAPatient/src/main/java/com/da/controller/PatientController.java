@@ -42,7 +42,7 @@ public class PatientController {
 	
 	@GetMapping("/list")
 	public List<Patient> patientList(@RequestParam("offset")Integer offset, @RequestParam("limit")Integer limit) throws InterruptedException, ExecutionException, TimeoutException {
-		logger.info("patientList invoked with param "+offset+"--"+limit);
+		logger.info("patientList invoked with param "+offset+"and"+limit);
 		return patientService.getPatientList(offset, limit);
 	}
 	
