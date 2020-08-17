@@ -1,0 +1,13 @@
+package com.da;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class DaPatientApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(DaPatientApplication.class, args);
+	}
+
+}
