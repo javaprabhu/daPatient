@@ -30,6 +30,14 @@ public class PatientService {
 		}
 		throw new InterruptedException("Patient is not valid");
 	}
+	public String updatePatient(Patient patient) throws InterruptedException, ExecutionException {
+		logger.info("savePatient service called");
+		if(patient!=null) {
+			//patient validation
+			return patientRepository.updatePatient(patient);
+		}
+		throw new InterruptedException("Patient is not valid");
+	}
 	
 	public Patient getPatient(String fName) throws InterruptedException, ExecutionException {
 		logger.info("getPatient service called");
@@ -40,6 +48,14 @@ public class PatientService {
 		logger.info("savePatient service called");
 		return patientRepository.getPatientList(offset, limit);
 	}
+	
+	public String softDeletePatient(String name) throws InterruptedException, ExecutionException {
+		logger.info("deletePatient service called");
+		ApiFuture<?> deletePatient = patientRepository.softDeletePatient(name);
+		if(deletePatient!=null)
+			return "Document with Patient ID "+name+" has been deleted";
+		return "Patient not found with name "+name;
+    }
 	
 	public String deletePatient(String name) throws InterruptedException, ExecutionException {
 		logger.info("deletePatient service called");

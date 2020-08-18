@@ -31,6 +31,12 @@ public class PatientRepository {
 		return apiFuture.get().getUpdateTime().toString();
 	}
 	
+	public String updatePatient(Patient patient) throws InterruptedException, ExecutionException {
+		Firestore fireStore = FirestoreClient.getFirestore();
+		ApiFuture<WriteResult> apiFuture = fireStore.collection(COL_NAME).document(patient.getfName()).set(patient);
+		return apiFuture.get().getUpdateTime().toString();
+	}
+	
 	public Patient getPatient(String fName) throws InterruptedException, ExecutionException {
 		Firestore fireStore = FirestoreClient.getFirestore();
 		DocumentReference document = fireStore.collection(COL_NAME).document(fName);
@@ -65,11 +71,19 @@ public class PatientRepository {
 		return patients;
 	}
 	
-	public ApiFuture<?> deletePatient(String fName) throws InterruptedException, ExecutionException {
+	public ApiFuture<?> softDeletePatient(String fName) throws InterruptedException, ExecutionException {
 		Patient patient = getPatient(fName);
         Firestore fireStore = FirestoreClient.getFirestore();
         patient.setDeleted(true);
 		ApiFuture<WriteResult> apiFuture = fireStore.collection(COL_NAME).document(fName).set(patient);
+		return apiFuture;
+	}
+	
+	public ApiFuture<?> deletePatient(String fName) throws InterruptedException, ExecutionException {
+		Patient patient = getPatient(fName);
+        Firestore fireStore = FirestoreClient.getFirestore();
+        patient.setDeleted(true);
+		ApiFuture<WriteResult> apiFuture = fireStore.collection(COL_NAME).document(fName).delete();
 		return apiFuture;
 	}
 }

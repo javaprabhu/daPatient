@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -32,6 +33,17 @@ public class PatientController {
 		logger.info("savePatient invoked with param "+patient);
 		try {
 			return patientService.savePatient(patient);
+		}catch(Exception e) {
+			logger.error(e.getMessage());
+			return "patient did not saved";
+		}
+	}
+	
+	@PutMapping("/updatePatient")
+	public String updatePatient(@RequestBody Patient patient) {
+		logger.info("updatePatient invoked with param "+patient);
+		try {
+			return patientService.updatePatient(patient);
 		}catch(Exception e) {
 			logger.error(e.getMessage());
 			return "patient did not saved";
@@ -61,7 +73,18 @@ public class PatientController {
 	}
 	
 	@DeleteMapping("/{fName}")
-	public String deletePatientWithName(@PathVariable("fName")String fName) {
+	public String softDeletePatient(@PathVariable("fName")String fName) {
+		logger.info("deletePatientWithName invoked with param "+fName);
+		try {
+			return patientService.softDeletePatient(fName);
+		}catch(Exception e) {
+			logger.error(e.getMessage());
+			return "Patient not found with name "+fName;
+		}
+	}
+	
+	@DeleteMapping("/delete/{fName}")
+	public String deletePatient(@PathVariable("fName")String fName) {
 		logger.info("deletePatientWithName invoked with param "+fName);
 		try {
 			return patientService.deletePatient(fName);
